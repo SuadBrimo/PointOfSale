@@ -1,0 +1,73 @@
+===========================
+Business Processes Overview
+===========================
+1. Product Management
+Description:
+Product management involves adding, updating, and removing products from the inventory. It includes categorizing products, assigning units of measurement, defining attributes, and managing stock levels.
+
+System Functions:
+Add Product: Allows users to add new products with detailed information such as name, code, description, category, unit, and cost price.
+Update Product: Enables users to modify product details such as name, description, category, and cost price.
+Delete Product: Allows users to remove products from the inventory.
+Categorization: Facilitates categorization of products into different categories for easy organization.
+Attribute Management: Supports defining and managing product attributes for customization and specification.
+Stock Level Monitoring: Tracks and manages stock levels to ensure sufficient inventory.
+
+2. Sales Management
+Description:
+Sales management involves processing customer orders, generating invoices, applying discounts, and recording sales transactions accurately.
+
+System Functions:
+Create Invoice: Allows users to generate invoices for sales transactions, specifying products, quantities, prices, discounts, and taxes.
+Apply Discounts: Enables users to apply discounts to invoices based on promotions or customer agreements.
+Record Sales: Records sales transactions in the system database for accurate tracking and reporting.
+Inventory Deduction: Automatically updates inventory levels and deducts sold quantities from stock.
+3. Warehouse Management
+Description:
+Warehouse management focuses on managing physical inventory locations, tracking stock movements, and optimizing warehouse operations.
+
+System Functions:
+Warehouse Setup: Allows users to define and configure warehouse locations where products are stored.
+Inventory Tracking: Tracks stock movements, including receipts, transfers, and withdrawals, to maintain accurate inventory records.
+Stock Replenishment: Provides alerts and notifications for low stock levels to prompt replenishment actions.
+Physical Inventory Management: Supports periodic physical inventory counts and adjustments for inventory accuracy.
+
+4. Purchase Request Management
+Description:
+Purchase request management involves initiating, reviewing, and approving requests for purchasing new products to replenish inventory.
+
+System Functions:
+Create Purchase Request: Allows users to create purchase requests specifying the products, quantities, and required attributes.
+Review Requests: Enables authorized users to review and approve purchase requests based on budget, inventory levels, and business needs.
+Track Request Status: Tracks the status of purchase requests, including pending, approved, and fulfilled requests.
+Generate Purchase Orders: Automatically generates purchase orders from approved purchase requests for vendor communication.
+
+5. Reporting and Analytics
+Description:
+Reporting and analytics provide insights into sales performance, inventory levels, product trends, and financial metrics to support decision-making.
+
+System Functions:
+Generate Reports: Provides predefined and customizable reports on sales, inventory, purchase history, and financial metrics.
+Analytics Dashboard: Presents key performance indicators (KPIs), trends, and graphical representations for data analysis.
+Forecasting: Utilizes historical data to forecast future sales, demand, and inventory requirements.
+Performance Analysis: Analyzes sales performance, product profitability, and inventory turnover for strategic planning.
+
+=========================
+Database Schema Overview:
+=========================
+The database schema consists of several tables that store information about units, categories, products, attributes, warehouses, point of sales, invoices, purchase requests, and images. These tables are interconnected through foreign key relationships to maintain data integrity and facilitate efficient querying.
+
+Tables
+Units: Stores information about units of measurement for products.
+Categories: Contains product categories to organize products.
+Products: Holds details about individual products, including their code, name, description, category, unit, cost price.
+Attributes: Stores attributes that can be associated with products.
+Attribute_Product: Establishes a many-to-many relationship between attributes and products.
+Warehouses: Stores information about physical locations where products are stored.
+Product_Warehouse: Tracks inventory levels of products in warehouses, including attributes, stock levels, and prices.
+Point_of_Sales: Stores information about different points of sale locations.
+Invoices: Contains details of sales transactions, including invoice number, date, point of sale, user, total price, discounts, and taxes.
+Invoice_Product: Establishes a many-to-many relationship between invoices and products, recording quantity, unit price, and total price for each product sold.
+Purchase_Requests: Manages purchase requests initiated for acquiring new products.
+Product_Purchase_Request: Establishes a many-to-many relationship between purchase requests and products, recording requested quantities and attributes.
+Images: Stores images associated with products.

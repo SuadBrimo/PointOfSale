@@ -1,0 +1,589 @@
+{
+	"info": {
+		"_postman_id": "087111f8-00b1-48cf-8037-722f4e742ce0",
+		"name": "Suad POS collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22925778"
+	},
+	"item": [
+		{
+			"name": "Point of sale products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Quantity is a non-negative integer\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.data).to.be.an('array');",
+							"",
+							"    responseData.data.forEach(function(product) {",
+							"        pm.expect(product.quantity).to.be.a('number');",
+							"        pm.expect(product.quantity).to.be.at.least(0, \"Quantity should be non-negative\");",
+							"    });",
+							"});",
+							"",
+							"",
+							"pm.test(\"Receive date is in a valid date format\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.data).to.be.an('array');",
+							"    ",
+							"    responseData.data.forEach(function(product) {",
+							"        pm.expect(product.receive_date).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+							"    });",
+							"});",
+							"",
+							"",
+							"pm.test(\"Attributes object is present and contains expected fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;",
+							"",
+							"    responseData.data.forEach(function(product) {",
+							"        pm.expect(product.attributes).to.exist.and.to.be.an('object');",
+							"        pm.expect(product.attributes.color).to.exist.and.to.be.a('string');",
+							"    });",
+							"});",
+							"",
+							"// Stores the first product's id in an environment or global variable",
+							"var productId = pm.response.json().data[0].id;",
+							"pm.globals.set(\"productId\", productId);",
+							"var template = `",
+							"<style type=\"text/css\">",
+							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+							"    .tftable tr {background-color:#ffffff;}",
+							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+							"    .tftable tr:hover {background-color:#e0ffff;}",
+							"</style>",
+							"",
+							"<table class=\"tftable\" border=\"1\">",
+							"    <tr>",
+							"        <th>ID</th>",
+							"        <th>Code</th>",
+							"        <th>Name</th>",
+							"        <th>Description</th>",
+							"        <th>Category ID</th>",
+							"        <th>Category Name</th>",
+							"        <th>Unit ID</th>",
+							"        <th>Unit Name</th>",
+							"        <th>Cost Price</th>",
+							"        <th>Warehouse ID</th>",
+							"        <th>Quantity</th>",
+							"        <th>Receive Date</th>",
+							"        <th>Attributes</th>",
+							"    </tr>",
+							"    ",
+							"    {{#each response.data}}",
+							"        <tr id=row_{{@key}}>",
+							"            <td>{{id}}</td>",
+							"            <td>{{code}}</td>",
+							"            <td>{{name}}</td>",
+							"            <td>{{description}}</td>",
+							"            <td>{{category_id}}</td>",
+							"            <td>{{category_name}}</td>",
+							"            <td>{{unit_id}}</td>",
+							"            <td>{{unit_name}}</td>",
+							"            <td>{{cost_price}}</td>",
+							"            <td>{{warehouse_id}}</td>",
+							"            <td>{{quantity}}</td>",
+							"            <td>{{receive_date}}</td>",
+							"            <td>{{attributes.color}}</td>",
+							"        </tr>",
+							"    {{/each}}",
+							"</table>",
+							"`;",
+							"",
+							"function constructVisualizerPayload() {",
+							"    return {response: pm.response.json()}",
+							"}",
+							"",
+							"pm.visualizer.set(template, constructVisualizerPayload());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/point-of-sale/2/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"point-of-sale",
+						"2",
+						"products"
+					]
+				},
+				"description": "\nThis endpoint retrieves a list of products associated with the point of sale with ID 1.\n\nThe response will be in JSON format and will contain an array of product objects, each including the product's ID, code, name, description, category details, unit details, cost price, warehouse details, quantity, receive date, and attributes such as color.\n\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Create product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `\r",
+							"<style type=\"text/css\">\r",
+							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+							"    .tftable tr {background-color:#ffffff;}\r",
+							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+							"    .tftable tr:hover {background-color:#e0ffff;}\r",
+							"</style>\r",
+							"\r",
+							"<table class=\"tftable\" border=\"1\">\r",
+							"    <tr>\r",
+							"        <th>Code</th>\r",
+							"        <th>Name</th>\r",
+							"        <th>Description</th>\r",
+							"        <th>Category ID</th>\r",
+							"        <th>Unit ID</th>\r",
+							"        <th>Cost Price</th>\r",
+							"        <th>Updated At</th>\r",
+							"        <th>Created At</th>\r",
+							"        <th>ID</th>\r",
+							"    </tr>\r",
+							"    <tr>\r",
+							"        <td>{{response.code}}</td>\r",
+							"        <td>{{response.name}}</td>\r",
+							"        <td>{{response.description}}</td>\r",
+							"        <td>{{response.category_id}}</td>\r",
+							"        <td>{{response.unit_id}}</td>\r",
+							"        <td>{{response.cost_price}}</td>\r",
+							"        <td>{{response.updated_at}}</td>\r",
+							"        <td>{{response.created_at}}</td>\r",
+							"        <td>{{response.id}}</td>\r",
+							"    </tr>\r",
+							"</table>\r",
+							"`;\r",
+							"\r",
+							"function constructVisualizerPayload() {\r",
+							"    return {response: pm.response.json()}\r",
+							"}\r",
+							"\r",
+							"pm.visualizer.set(template, constructVisualizerPayload());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "code",
+							"value": "x011",
+							"type": "text"
+						},
+						{
+							"key": "category_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "unit_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "cost_price",
+							"value": "999",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "This validation user-assigned extension of the file, you may use the extensions rule.",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "sgdhgdtryrtyt",
+							"type": "text"
+						},
+						{
+							"key": "attributes[0][id]",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "attributes[0][value]",
+							"value": "zzz",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/C:/Users/ASUS/Desktop/369739050_760536789412354_2832338039063062833_n.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"products"
+					]
+				},
+				"description": "\nThis API endpoint allows you to create a new product by making an HTTP POST request to the specified URL. The request should include form-data in the request body.\n\n### Request Body\n- No specific parameters were provided for the form-data request body.\n\n### Response\nUpon a successful creation, the API responds with a status code of 201 and a JSON object containing the details of the newly created product, including its ID, code, name, description, category ID, unit ID, cost price, and timestamps for creation and update.\n\nExample:\n```json\n{\n    \"code\": \"\",\n    \"name\": \"\",\n    \"description\": \"\",\n    \"category_id\": \"\",\n    \"unit_id\": \"\",\n    \"cost_price\": \"\",\n    \"updated_at\": \"\",\n    \"created_at\": \"\",\n    \"id\": 0\n}\n```\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Update product",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "code",
+							"value": "x00000000001",
+							"type": "text"
+						},
+						{
+							"key": "category_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "unit_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "cost_price",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "yyyyxxx",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "sgdhgdtryrtyt",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": [
+								"/C:/Users/SB1992/Downloads/beeimgtmp-20240123-094116.png"
+							],
+							"disabled": true
+						},
+						{
+							"key": "id",
+							"value": "39",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/products/11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"products",
+						"11"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "cccc1",
+							"disabled": true
+						},
+						{
+							"key": "name",
+							"value": "cccccc",
+							"disabled": true
+						},
+						{
+							"key": "description",
+							"value": "ssss",
+							"disabled": true
+						},
+						{
+							"key": "cost_price",
+							"value": "9999",
+							"disabled": true
+						},
+						{
+							"key": "attributes[1][id]",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "attributes[1][value]",
+							"value": "dddd",
+							"disabled": true
+						}
+					]
+				},
+				"description": "This HTTP PUT request is used to update a specific product with the ID 11. The request should include the updated information for the product in the x-www-form-urlencoded request body type.\n\n### Request Parameters\n\n- No specific request parameters were provided.\n    \n\n### Response\n\n- Status: 422\n- Content-Type: application/json\n    \n\n#### Response Body\n\nThe response includes a JSON object with a \"message\" field and an \"errors\" field. The \"errors\" field contains details about the validation errors, such as the \"code\" field for the specific error."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete product",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/products/11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"products",
+						"11"
+					]
+				},
+				"description": "This endpoint sends an HTTP DELETE request to the specified URL to delete a product with the ID 11.\n\nThe last execution of this request returned a 404 status code with a JSON response containing an empty message, exception, file, line, and trace details."
+			},
+			"response": []
+		},
+		{
+			"name": "Point of sale invoices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var template = `\r",
+							"<style type=\"text/css\">\r",
+							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+							"    .tftable tr {background-color:#ffffff;}\r",
+							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+							"    .tftable tr:hover {background-color:#e0ffff;}\r",
+							"</style>\r",
+							"\r",
+							"<table class=\"tftable\" border=\"1\">\r",
+							"    <tr>\r",
+							"        <th>Invoice Number</th>\r",
+							"        <th>Invoice Date</th>\r",
+							"        <th>Total Price</th>\r",
+							"        <th>Discount</th>\r",
+							"        <th>Tax</th>\r",
+							"    </tr>\r",
+							"    \r",
+							"    {{#each response.data}}\r",
+							"        <tr>\r",
+							"            <td>{{invoice_number}}</td>\r",
+							"            <td>{{invoice_date}}</td>\r",
+							"            <td>{{total_price}}</td>\r",
+							"            <td>{{discount}}</td>\r",
+							"            <td>{{tax}}</td>\r",
+							"        </tr>\r",
+							"    {{/each}}\r",
+							"</table>\r",
+							"`;\r",
+							"\r",
+							"function constructVisualizerPayload() {\r",
+							"    return {response: pm.response.json()}\r",
+							"}\r",
+							"\r",
+							"pm.visualizer.set(template, constructVisualizerPayload());"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/point-of-sale/21/invoices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"point-of-sale",
+						"21",
+						"invoices"
+					]
+				},
+				"description": "This endpoint makes an HTTP GET request to retrieve the invoices associated with a specific point of sale. The response will be in JSON format and will include an array of invoice objects, each containing details such as invoice number, date, total price, discount, tax, and the list of products included in the invoice. Each product will have its own set of attributes like quantity, unit price, total price, and product details like code, name, description, category, unit, and cost price."
+			},
+			"response": []
+		},
+		{
+			"name": "Create invoice",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"invoice_date\": \"2023-11-27\",\r\n  \"discount\": \"50%\",\r\n  \"tax\": \"5\",\r\n  \"invoice_products\": [\r\n    {\r\n       \"id\": null,\r\n      \"product_warehouse_id\": 1,\r\n      \"quantity\": 2,\r\n      \"unit_price\": 10.00\r\n    },\r\n    {\r\n          \"id\": null,\r\n        \"product_warehouse_id\": 2,\r\n      \"quantity\": 1,\r\n      \"unit_price\": 25.00\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/point-of-sale/1/invoices",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"point-of-sale",
+						"1",
+						"invoices"
+					]
+				},
+				"description": "\n### Add Invoice to Point of Sale\nThis endpoint allows you to add a new invoice to the point of sale with the specified ID.\n\n#### Request Body\n- `invoice_date` (string): The date of the invoice.\n- `discount` (string): The discount applied to the invoice.\n- `tax` (string): The tax amount for the invoice.\n- `invoice_products` (array): An array of products included in the invoice, each containing:\n  - `id` (integer): The ID of the product.\n  - `product_warehouse_id` (integer): The ID of the product warehouse.\n  - `quantity` (string): The quantity of the product.\n  - `unit_price` (string): The unit price of the product.\n\n#### Response\n- `invoice_number` (integer): The invoice number.\n- `point_of_sale_id` (integer): The ID of the point of sale.\n- `user_id` (integer): The ID of the user associated with the invoice.\n- `invoice_date` (string): The date of the invoice.\n- `total_price` (integer): The total price of the invoice.\n- `discount` (string): The discount applied to the invoice.\n- `tax` (string): The tax amount for the invoice.\n- `updated_at` (string): The date of the last update.\n- `created_at` (string): The date of creation.\n- `id` (integer): The ID of the invoice.\n- `invoice_products` (array): An array of products included in the invoice, each containing:\n  - `id` (integer): The ID of the product in the invoice.\n  - `invoice_id` (integer): The ID of the invoice.\n  - `product_warehouse_id` (integer): The ID of the product warehouse.\n  - `quantity` (string): The quantity of the product in the invoice.\n  - `unit_price` (string): The unit price of the product in the invoice.\n  - `total_price` (string): The total price of the product in the invoice.\n  - `created_at` (string): The date of creation.\n  - `updated_at` (string): The date of the last update.\n  - `deleted_at` (string): The date of deletion, if applicable.\n  - `product_warehouse` (object): Details of the product warehouse, including:\n    - `id` (integer): The ID of the product warehouse.\n    - `warehouse_id` (integer): The ID of the warehouse.\n    - `product_id` (integer): The ID of the product.\n    - `product_attributes` (object): Attributes of the product, such as brand, model, and style.\n    - `min_stock_level` (string): The minimum stock level of the product.\n    - `quantity` (integer): The quantity of the product in the warehouse.\n    - `unit_price` (string): The unit price of the product.\n    - `receive_date` (string): The date of product reception.\n    - `created_at` (string): The date of creation.\n    - `updated_at` (string): The date of the last update.\n    - `product` (object): Details of the product, including:\n      - `id` (integer): The ID of the product.\n      - `code` (string): The product code.\n      - `name` (string): The product name.\n      - `description` (string): The product description.\n      - `category_id` (integer): The ID of the product category.\n      - `unit_id` (integer): The ID of the product unit.\n      - `cost_price` (string): The cost price of the product.\n      - `created_at` (string): The date of creation.\n      - `updated_at` (string): The date of the last update.\n      - `deleted_at` (string): The date of deletion, if applicable.\n\n#### Example\n```json\n{\n    \"invoice_date\": \"2022-01-01\",\n    \"discount\": \"10%\",\n    \"tax\": \"5%\",\n    \"invoice_products\": [\n        {\n            \"id\": 1,\n            \"product_warehouse_id\": 123,\n            \"quantity\": \"5\",\n            \"unit_price\": \"50\"\n        }\n    ]\n}\n```\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Update invoice",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"invoice_date\": \"2023-11-27\",\r\n  \"discount\": \"50%\",\r\n  \"tax\": \"5\",\r\n  \"invoice_products\": [\r\n    {\r\n       \"id\": 3,\r\n      \"product_warehouse_id\": 1,\r\n      \"quantity\": 3,\r\n      \"unit_price\": 10.00\r\n    },\r\n    {\r\n          \"id\": null,\r\n        \"product_warehouse_id\": 2,\r\n      \"quantity\": 4,\r\n      \"unit_price\": 25.00\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/point-of-sale/1/invoices/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"point-of-sale",
+						"1",
+						"invoices",
+						"5"
+					]
+				},
+				"description": "\n### Update Invoice\nThis endpoint allows the user to update an existing invoice for a specific point of sale.\n\n#### Request Body\n- `invoice_date` (string, optional): The date of the invoice.\n- `discount` (string, optional): The discount applied to the invoice.\n- `tax` (string, optional): The tax applied to the invoice.\n- `invoice_products` (array): An array of objects containing details of the products in the invoice, including `id`, `product_warehouse_id`, `quantity`, and `unit_price`.\n\nExample:\n```json\n{\n    \"invoice_date\": \"\",\n    \"discount\": \"\",\n    \"tax\": \"\",\n    \"invoice_products\": [\n        {\n            \"id\": 0,\n            \"product_warehouse_id\": 0,\n            \"quantity\": 0,\n            \"unit_price\": 0\n        }\n    ]\n}\n```\n\n#### Response\n- `id` (integer): The ID of the updated invoice.\n- `invoice_number` (string): The invoice number.\n- `invoice_date` (string): The date of the invoice.\n- `point_of_sale_id` (integer): The ID of the point of sale.\n- `user_id` (integer): The ID of the user associated with the invoice.\n- `total_price` (integer): The total price of the invoice.\n- `discount` (string): The discount applied to the invoice.\n- `tax` (string): The tax applied to the invoice.\n- `created_at` (string): The timestamp of creation.\n- `updated_at` (string): The timestamp of the last update.\n- `deleted_at` (null or string): The timestamp of deletion, if applicable.\n\nExample Response:\n```json\n{\n    \"id\": 0,\n    \"invoice_number\": \"\",\n    \"invoice_date\": \"\",\n    \"point_of_sale_id\": 0,\n    \"user_id\": 0,\n    \"total_price\": 0,\n    \"discount\": \"\",\n    \"tax\": \"\",\n    \"created_at\": \"\",\n    \"updated_at\": \"\",\n    \"deleted_at\": null\n}\n```\n\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete invoice",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost/suad_pos/public/api/point-of-sale/1/invoices/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"suad_pos",
+						"public",
+						"api",
+						"point-of-sale",
+						"1",
+						"invoices",
+						"1"
+					]
+				},
+				"description": "\nThis endpoint sends an HTTP DELETE request to delete the invoice with ID 1 from the point of sale with ID 1.\n\nUpon successful deletion, the endpoint returns a status code of 200 with a JSON response containing a message indicating the success of the operation.\n"
+			},
+			"response": []
+		}
+	]
+}
